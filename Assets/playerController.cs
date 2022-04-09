@@ -4,8 +4,10 @@ using UnityEngine;
 
 public class playerController : MonoBehaviour
 {
-    [SerializeField] List<Vector3> target = new List<Vector3>();
+    [SerializeField] Queue<Vector3> targets = new Queue<Vector3>();
     [SerializeField] float Speed = 100;
+
+    Vector3 currentTarget = Vector3.zero;
 
     int currentIndex = 0;
 
@@ -25,7 +27,7 @@ public class playerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        Debug.Log(targets.Count);
 
         if (Input.GetMouseButtonDown(0))
         {
@@ -34,20 +36,21 @@ public class playerController : MonoBehaviour
 
             worldPos.z = 0;
 
-            target.Add(worldPos);
+            targets.Enqueue(worldPos);
         }
 
-        if (target.Count == 0)
+        if (targets.Count == 0)
             return;
 
-        if (currentIndex >= target.Count)
+        if (currentIndex >= targets.Count)
             return;
 
-        this.transform.position = Vector3.MoveTowards(this.transform.position, target[currentIndex], Speed * Time.deltaTime);
+
+        this.transform.position = Vector3.MoveTowards(this.transform.position, currentTarget, Speed * Time.deltaTime);
 
 
-        if (Vector2.Distance(this.transform.position, target[currentIndex]) <= 0.5f)
-            currentIndex++;
+        if (currentTarget == Vector3.zero || Vector2.Distance(this.transform.position, currentTarget) <= 0.5f)
+            currentTarget = targets.Dequeue();
 
         //Time.timeScale = 0;
 
